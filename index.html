@@ -31,6 +31,11 @@
             color: #9ca3af; /* gray-400 */
             white-space: pre-wrap; /* Allows for text formatting */
         }
+        .output-separator {
+            white-space: nowrap; /* Prevents the line from wrapping */
+            overflow: hidden;    /* Hides any hyphens that go past the edge */
+            width: 100%;         /* Ensures it tries to fill the container */
+        }
         .output strong {
             color: #f9fafb; /* gray-50 */
         }
@@ -115,7 +120,7 @@
                 <h1>DAVID KHACHATRYAN</h1>
                 <p>github.com/davkh | linkedin.com/in/davkh | Yerevan, Armenia</p>
             </div>
-            <img src="profile.webp" alt="David Khachatryan" style="width:150px;border-radius:50%;">
+            <img src="profile.webp" alt="David Khachatryan">
         </div>
         <hr style="border-top: 1px solid #ccc; margin: 1rem 0;">
         <p><strong>ENGINEERING DIRECTOR · HANDS-ON C# ENGINEER (Ruby & JavaScript for hobby projects)</strong></p>
@@ -183,13 +188,12 @@
     <script>
         function formatContent() {
             const script = [
-                '<span class="prompt"></span>show --photo^1500',
-                '<span class="output"><img src="profile.webp" alt="David Khachatryan" class="w-24 h-24 rounded-full my-4 float-left mr-4"></span>',
-                '<span class="prompt"></span>cat ./profile.txt^1500',
-                '<span class="output">DAVID KHACHATRYAN<br><a href="https://github.com/davkh" target="_blank">github.com/davkh</a> | <a href="https://linkedin.com/in/davkh" target="_blank">linkedin.com/in/davkh</a> | Yerevan, Armenia</span>',
-                '<span class="output" style="clear:both;">----------------------------------------------------------------------------------------------------------------</span>',
+                '<span class="prompt"></span>cat ./profile.txt --show-photo^1500',
+                '<span class="output"><img id="profile-photo" src="profile.webp" alt="David Khachatryan" class="w-24 h-24 rounded-full my-4 float-left mr-4" style="opacity:0; transition: opacity 0.5s;"></span>',
+                '<span class="output"><strong>DAVID KHACHATRYAN</strong></span>',
                 '<span class="output">ENGINEERING DIRECTOR &middot; HANDS-ON C# ENGINEER (Ruby & JavaScript for hobby projects)</span>',
-                '<span class="prompt"></span>^1000',
+                '<span class="output" style="clear:both;"><a href="https://github.com/davkh" target="_blank">github.com/davkh</a> | <a href="https://linkedin.com/in/davkh" target="_blank">linkedin.com/in/davkh</a> | Yerevan, Armenia</span>',
+                '<span class="output output-separator">------------------------------------------------------------------------------------------------------------------------------------</span>',
                 '<span class="prompt"></span>cat ./experience.log | less^1500',
                 '<span class="output"><strong>Ultra Labs - Startup Studio &middot; Engineering Director (2023 - present)</strong></span>',
                 '<span class="output">* Provide engineering leadership for several early-stage startups built on <strong>Java Spring Boot</strong>.</span>',
@@ -206,7 +210,6 @@
                 '<span class="output"> </span>',
                 '<span class="output"><strong>Integrity Project (acq. Mellanox) &middot; Software Engineer (part-time) (2012)</strong></span>',
                 '<span class="output">* Part of compiler team implementing Base Class Library for a new C# compiler for microcontrollers.</span>',
-                '<span class="prompt"></span>^1000',
                 '<span class="prompt"></span>cat ./community.md^1500',
                 '<span class="output"><strong>COMMUNITY & TEACHING</strong></span>',
                 '<span class="output">--------------------</span>',
@@ -217,7 +220,6 @@
                 '<span class="output">------------</span>',
                 '<span class="output">* <strong>Dand language compiler</strong> - C#, Lex/Yacc implementation: <a href="https://github.com/davkh/Dand" target="_blank">github.com/davkh/Dand</a></span>',
                 '<span class="output">* <strong>NuGet profile</strong> - assorted .NET utilities: <a href="https://nuget.org/profiles/davkh" target="_blank">nuget.org/profiles/davkh</a></span>',
-                '<span class="prompt"></span>^1000',
                 '<span class="prompt"></span>cat ./skills_and_edu.conf^1500',
                 '<span class="output"><strong>SKILLS</strong></span>',
                 '<span class="output">------</span>',
@@ -229,16 +231,14 @@
                 '<span class="output">---------</span>',
                 '<span class="output">M.Sc. Computer Science - Yerevan State University, 2014 (Diploma with Honors &middot; GPA 19.96 / 20)</span>',
                 '<span class="output">B.Sc. Computer Science - Yerevan State University, 2012 (Diploma with Honors &middot; GPA 19.41 / 20)</span>',
-                '<span class="prompt"></span>^1000',
                 '<span class="prompt"></span>cat ./hobbies.txt^1500',
                 '<span class="output"><strong>HOBBIES</strong></span>',
                 '<span class="output">-------</span>',
                 '<span class="output">* Chess - FIDE rating 1705: <a href="https://ratings.fide.com/profile/309104990" target="_blank">ratings.fide.com/profile/309104990</a></span>',
                 '<span class="prompt"></span>^1000',
-                '<span class="output">----------------------------------------------------------------------------------------------------------------</span>',
+                '<span class="output output-separator">------------------------------------------------------------------------------------------------------------------------------------</span>',
                 '<span class="output">Profile loaded. To download a print-friendly PDF version, execute the command below.</span>',
-                '<span class="prompt"></span><a href="#" onclick="window.print(); return false;" class="clickable-command">./download_cv.sh</a>',
-                '<span class="prompt"></span>'
+                '<span class="prompt"></span><a href="#" onclick="window.print(); return false;" class="clickable-command">./download_cv.sh</a>'
             ];
             
             return script.join('<br>');
@@ -254,8 +254,20 @@
             showCursor: true,
             cursorChar: '▋',
             contentType: 'html',
-            onStringTyped: function() {
-                 terminalContent.scrollTop = terminalContent.scrollHeight;
+            onStringTyped: function(arrayPos, self) {
+                // Always scroll to keep current line in view
+                terminalContent.scrollTop = terminalContent.scrollHeight;
+
+                // Check if the image string was just typed (index 1)
+                if (arrayPos === 1) {
+                    const img = document.getElementById('profile-photo');
+                    if (img) {
+                        // Use a short delay to ensure the element is fully in the DOM before fading in
+                        setTimeout(() => {
+                            img.style.opacity = 1;
+                        }, 50); 
+                    }
+                }
             },
         });
     </script>
