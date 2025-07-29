@@ -120,7 +120,7 @@
                 <h1>DAVID KHACHATRYAN</h1>
                 <p>github.com/davkh | linkedin.com/in/davkh | Yerevan, Armenia</p>
             </div>
-            <img src="profile.webp" alt="David Khachatryan">
+            <img src="profile.webp" alt="David Khachatryan" style="width:150px;border-radius:50%;">
         </div>
         <hr style="border-top: 1px solid #ccc; margin: 1rem 0;">
         <p><strong>ENGINEERING DIRECTOR · HANDS-ON C# ENGINEER (Ruby & JavaScript for hobby projects)</strong></p>
@@ -257,6 +257,8 @@
             onStringTyped: function(arrayPos, self) {
                 // Always scroll to keep current line in view
                 terminalContent.scrollTop = terminalContent.scrollHeight;
+
+                return;
 
                 // Check if the image string was just typed (index 1)
                 if (arrayPos === 1) {
