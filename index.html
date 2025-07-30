@@ -129,6 +129,26 @@
                 text-decoration: none;
             }
         }
+
+        @media print {
+          /* 1️⃣ Hide the whole page first */
+          body * {
+            display: none !important;   /* !important trumps Tailwind’s “flex”, “grid”, etc. */
+          }
+        
+          /* 2️⃣ …then re‑enable the CV */
+          .print-only,
+          .print-only * {
+            display: block !important;
+          }
+        
+          /* 3️⃣ Optional: make the CV start at the top of the page */
+          .print-only {
+            position: static !important;
+            margin: 0 !important;
+            padding: 0.5in !important;  /* adjust to taste */
+          }
+        }
     </style>
 </head>
 <body>
